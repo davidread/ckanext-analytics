@@ -304,7 +304,7 @@ def export__(activity_dicts):
             print(u'  activity {}/{} {}'.format(
                   i + 1, num_activities, activity[u'timestamp']))
 
-            activity = model_dictize.package_activity_list_dictize(
+            activity = package_activity_list_dictize(
                 activity_objects, package.name, package.title, context,
                 include_data=data_dict['include_data'])
 
@@ -326,6 +326,26 @@ def export__(activity_dicts):
                 # print '    {} dataset {}'.format(actor_name, repr(dataset))
 
     print(u'Saved: {}'.format(args.output))
+
+
+def package_activity_list_dictize(activity_list, package_name, package_title,
+                                  context, include_data=False):
+    '''all the activities are to do with one specific package, given by
+    package_name/title.
+    Similar to model_dictize.activity_list_dictize, but provides the package
+    name and title
+    '''
+    import ckan.lib.dictization.model_dictize as model_dictize
+    dictized_activity_list = []
+    for activity in activity_list:
+        dictized_activity = \
+            model_dictize.activity_dictize(activity, context, include_data)
+        dictized_activity['package'] = dict(
+            id=dictized_activity['object_id'],
+            name=package_name, title=package_title)
+        dictized_activity['object_type'] = 'package'
+        dictized_activity_list.append(dictized_activity)
+    return dictized_activity_list
 
 
 ### this is an alternative way using a query
